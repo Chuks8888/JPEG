@@ -7,6 +7,9 @@ namespace BMP {
 
 void BMP::readBMP(std::ifstream& pic)
 {
+    pic.clear();
+    pic.seekg(0);
+
     pic.read(reinterpret_cast<char*>(&header), sizeof(fileHeader));
 
     if(header.identity != 0x4D42)
@@ -15,9 +18,9 @@ void BMP::readBMP(std::ifstream& pic)
         exit(2);
     }
 
-    if(header.bdiSize >= 0x0028)
-        pic.read(reinterpret_cast<char*>(&info), sizeof(bdiInfo));
-    else
+    pic.read(reinterpret_cast<char*>(&info), 0x28);
+    
+    if(info.bdiSize < 0x0028)
     {
         std::cerr << "non compatible BDI format\n";
         exit(3);
@@ -32,8 +35,8 @@ void BMP::printBMP()
     std::cout << "Reserved1: " << header.reserved1 << std::endl;
     std::cout << "Reserved2: " << header.reserved2 << std::endl;
     std::cout << "Offset to Pixel Data: " << header.offset << " bytes" << std::endl;
-    std::cout << "BDI Size: " << header.bdiSize << " bytes" << std::endl;
     std::cout << std::endl;
+    std::cout << "BDI Size: " << info.bdiSize << " bytes" << std::endl;
     std::cout << "Bitmap Info Header:" << std::endl;
     std::cout << "Width: " << info.Width << " pixels" << std::endl;
     std::cout << "Height: " << info.Height << " pixels" << std::endl;
