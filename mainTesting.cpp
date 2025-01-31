@@ -1,11 +1,7 @@
 #include "BMP.h"
 
-std::tuple<uint8_t, uint8_t, uint8_t> BGRtoYCbCr(std::tuple<uint8_t, uint8_t, uint8_t> bgr)
+std::tuple<uint8_t, uint8_t, uint8_t> BGRtoYCbCr(uint8_t b, uint8_t g, uint8_t r)
 {
-    uint8_t b = std::get<0>(bgr);
-    uint8_t g = std::get<1>(bgr);
-    uint8_t r = std::get<2>(bgr);
-
     uint8_t y  = (uint8_t)(0.299 * r + 0.587 * g + 0.114 * b);
     uint8_t cb = (uint8_t)(-0.1687 * r - 0.3313 * g + 0.5 * b + 128);
     uint8_t cr = (uint8_t)(0.5 * r - 0.4187 * g - 0.0813 * b + 128);
@@ -59,8 +55,7 @@ int main()
         for(int j = 0; j < rowSize; j+=3)
         {
             uint8_t *temp = ptr;
-            std::tuple<uint8_t, uint8_t, uint8_t> bgr = {*ptr, *(++ptr), *(++ptr)};
-            std::tuple<uint8_t, uint8_t, uint8_t> ycbcr = BGRtoYCbCr(bgr);
+            std::tuple<uint8_t, uint8_t, uint8_t> ycbcr = BGRtoYCbCr(*ptr, *(++ptr), *(++ptr));
             *temp = std::get<0>(ycbcr);
             *(++temp) = 0x0;
             *(++temp) = 0x0;
