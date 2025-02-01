@@ -56,7 +56,7 @@ int main()
         {
             uint8_t *temp = ptr;
             std::tuple<uint8_t, uint8_t, uint8_t> ycbcr = BGRtoYCbCr(*ptr, *(++ptr), *(++ptr));
-            *temp = std::get<0>(ycbcr);
+            *temp = std::get<1>(ycbcr);
             *(++temp) = 0x0;
             *(++temp) = 0x0;
             ptr++;
