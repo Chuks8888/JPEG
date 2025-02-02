@@ -4,11 +4,10 @@
 #pragma once
 #include <iostream>
 #include <fstream>
-#include <array>
 #include <algorithm>
 #include <cstring>
 #include <cmath>
-#include <tuple>
+#include <vector>
 
 #pragma pack(push, 1)
 namespace BMP

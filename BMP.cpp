@@ -22,8 +22,20 @@ void BMP::readBMP(std::ifstream& pic)
     
     if(info.bdiSize < 0x0028)
     {
-        std::cerr << "non compatible BDI format\n";
+        std::cerr << "non compatible DIB format\n";
         exit(3);
+    }
+
+    if(info.BitCount != 0x18)
+    {
+        std::cerr << "bit count is not 24bpp";
+        exit(4);
+    }
+
+    if(info.Width % 0x8 || info.Height % 0x8)
+    {
+        std::cerr << "Image widht or height is not divisible by 8";
+        exit(5);
     }
 }
 

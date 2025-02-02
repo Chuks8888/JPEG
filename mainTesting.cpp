@@ -1,12 +1,10 @@
 #include "BMP.h"
 
-std::tuple<uint8_t, uint8_t, uint8_t> BGRtoYCbCr(uint8_t b, uint8_t g, uint8_t r)
+void BGRtoYCbCr(uint8_t b, uint8_t g, uint8_t r, uint8_t &y, uint8_t &cb, uint8_t &cr)
 {
-    uint8_t y  = (uint8_t)(0.299 * r + 0.587 * g + 0.114 * b);
-    uint8_t cb = (uint8_t)(-0.1687 * r - 0.3313 * g + 0.5 * b + 128);
-    uint8_t cr = (uint8_t)(0.5 * r - 0.4187 * g - 0.0813 * b + 128);
-
-    return std::make_tuple(y, cb, cr);
+    y  = (uint8_t)(0.299 * r + 0.587 * g + 0.114 * b);
+    cb = (uint8_t)(-0.1687 * r - 0.3313 * g + 0.5 * b + 128);
+    cr = (uint8_t)(0.5 * r - 0.4187 * g - 0.0813 * b + 128);
 }
 
 int main()
@@ -42,24 +40,28 @@ int main()
     output.write(reinterpret_cast<char*>(&BMP::info), 0x28);
 
     // Row size 
-    int rowSize = (int)ceil(((int)BMP::info.BitCount * (int)BMP::info.Width) / 32) * 4;
+    int rowSize = (int)ceil((BMP::info.BitCount * BMP::info.Width) / 32) * 4;
+    int pixelRowSize = (int)(BMP::info.Width * BMP::info.BitCount / 8);
+    int paddingBytes = rowSize - pixelRowSize;
+
     uint8_t *row = new uint8_t[rowSize];
     uint8_t *ptr;
 
+    std::vector<uint8_t> Y, Cb, Cr;
 
+    uint8_t y, cb, cr;
     for(int i = 0; i < BMP::info.Height; i++)
     {
         picture.read(reinterpret_cast<char*>(row), rowSize);
         ptr = row;
 
-        for(int j = 0; j < rowSize; j+=3)
+        for(int j = 0; j < pixelRowSize; j+=3)
         {
             uint8_t *temp = ptr;
-            std::tuple<uint8_t, uint8_t, uint8_t> ycbcr = BGRtoYCbCr(*ptr, *(++ptr), *(++ptr));
-            *temp = std::get<1>(ycbcr);
-            *(++temp) = 0x0;
-            *(++temp) = 0x0;
-            ptr++;
+            BGRtoYCbCr(*(ptr++), *(ptr++), *(ptr++), y, cb, cr);
+            *temp = y;
+            *(++temp) = y;
+            *(++temp) = y;
         }
 
         output.write(reinterpret_cast<char*>(row), rowSize);
