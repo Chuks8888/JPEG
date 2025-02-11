@@ -10,18 +10,19 @@ void BGRtoYCbCr(uint8_t b, uint8_t g, uint8_t r, uint8_t &y, uint8_t &cb, uint8_
 int main()
 {
     std::ifstream picture;
-    picture.open("C:/git/JPEG/Sony-a7c-Shotkit-2.bmp", std::ios::binary);
+    picture.open("C:/Users/Hugo/git/JPEG/Canon-5DMarkII-Shotkit-4.bmp", std::ios::binary);
     if(!picture)
     {
-        std::cerr << "Error reading picture";
+        std::cerr << "Error reading picture\n";
         exit(1);
     }
 
     std::ofstream output;
-    output.open("C:/git/JPEG/Testing.bmp", std::ios::binary);
+    //output.open("C:/git/JPEG/Testing.bmp", std::ios::binary);
+    output.open("C:/Users/Hugo/git/JPEG/Testing.bmp", std::ios::binary);
     if(!output)
     {
-        std::cerr << "Error opening picture";
+        std::cerr << "Error opening picture\n";
         exit(1);
     }
 
