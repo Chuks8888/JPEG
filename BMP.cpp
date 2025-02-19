@@ -34,6 +34,7 @@ void BMP::readBMP(std::ifstream& pic)
 
     if(info.Width % 0x8 || info.Height % 0x8)
     {
+        // Try to introduce padding if the condition is not satisfied
         std::cerr << "Image widht or height is not divisible by 8";
         exit(5);
     }

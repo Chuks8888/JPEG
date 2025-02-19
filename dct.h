@@ -12,11 +12,18 @@ class dct
     private:
         static float cosines[64];
         static float coefficients[8];
+        static bool init;
+
+        float getSum(int u, int v, float arr[]);
+
     public:
         dct();
         ~dct();
 
-        void transform(float *);   
+        // This should be an inner class, to make this method private
+        // so that this function is not called
+        // on an array of a different size (i.e. not 64 elements)
+        void transform(float arr[]);   
 };
 
 #endif
