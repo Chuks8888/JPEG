@@ -8,11 +8,29 @@ void BGRtoYCbCr(uint8_t b, uint8_t g, uint8_t r, uint8_t &y, uint8_t &cb, uint8_
     cr = (uint8_t)(0.5 * r - 0.4187 * g - 0.0813 * b + 128);
 }
 
+void getColorChannels(uint8_t *data, uint8_t *Y, uint8_t *Cb, uint8_t *Cr)
+{
+    uint8_t y, cb, cr;
+    for(int i = 0; i < BMP::info.Height; i++)
+    {
+        for(int j = 0; j < BMP::info.Width; j+=3)
+        {
+            BGRtoYCbCr(*(data++), *(data++), *(data++), y, cb, cr);
+            *(Y++) = y;
+            *(Cb++) = cb;
+            *(Cr++) = cr;
+        }
+        for(int j = BMP::pixelRowSize; j < BMP::rowSize; j++)
+            data++;
+    }
+    std::cout << "No memory leaks ?\n";
+}
+
 int main()
 {
 
     std::ifstream picture;
-    picture.open("C:/Users/Hugo/git/JPEG/Canon-5DMarkII-Shotkit-4.bmp", std::ios::binary);
+    picture.open("C:/git/JPEG/Sony-a7c-Shotkit-2.bmp", std::ios::binary);
     if(!picture)
     {
         std::cerr << "Error reading picture\n";
@@ -21,7 +39,7 @@ int main()
 
     std::ofstream output;
     //output.open("C:/git/JPEG/Testing.bmp", std::ios::binary);
-    output.open("C:/Users/Hugo/git/JPEG/Testing.bmp", std::ios::binary);
+    output.open("Testing.bmp", std::ios::binary);
     if(!output)
     {
         std::cerr << "Error opening picture\n";
@@ -36,45 +54,31 @@ int main()
     picture.seekg((int)BMP::header.offset);
 
     // Do it only when original values are no longer necessary
-    BMP::info.bdiSize = 0x28;
-    BMP::header.offset = 0x36;
-
-    output.write(reinterpret_cast<char*>(&BMP::header), 0x0e);
-    output.write(reinterpret_cast<char*>(&BMP::info), 0x28);
+    //BMP::info.bdiSize = 0x28;
+    //BMP::header.offset = 0x36;
+    //output.write(reinterpret_cast<char*>(&BMP::header), 0x0e);
+    //output.write(reinterpret_cast<char*>(&BMP::info), 0x28);
 
     // Row size 
-    int rowSize = (int)ceil((BMP::info.BitCount * BMP::info.Width) / 32) * 4;
-    int pixelRowSize = (int)(BMP::info.Width * BMP::info.BitCount / 8);
-    int paddingBytes = rowSize - pixelRowSize;
+    //int rowSize = (int)ceil((BMP::info.BitCount * BMP::info.Width) / 32) * 4;
+    //int pixelRowSize = (int)(BMP::info.Width * BMP::info.BitCount / 8);
+    //int paddingBytes = rowSize - pixelRowSize;
 
-    uint8_t *row = new uint8_t[rowSize];
-    uint8_t *ptr;
+    uint8_t *pixelData = new uint8_t[BMP::rowSize * BMP::info.Height];
+    picture.read(reinterpret_cast<char*>(pixelData), BMP::rowSize * BMP::info.Height);
 
-    std::vector<uint8_t> Y, Cb, Cr;
+    uint8_t *Y = new uint8_t[(BMP::info.Width * BMP::info.Height)];
+    uint8_t *Cb = new uint8_t[(BMP::info.Width * BMP::info.Height)];
+    uint8_t *Cr = new uint8_t[(BMP::info.Width * BMP::info.Height)];
 
-    uint8_t y, cb, cr;
-    for(int i = 0; i < BMP::info.Height; i++)
-    {
-        picture.read(reinterpret_cast<char*>(row), rowSize);
-        ptr = row;
+    getColorChannels(pixelData, Y, Cb, Cr);
 
-        for(int j = 0; j < pixelRowSize; j+=3)
-        {
-            uint8_t *temp = ptr;
-            BGRtoYCbCr(*(ptr++), *(ptr++), *(ptr++), y, cb, cr);
-            
-            // NOT CORRECT
-            *temp = y;
-            *(++temp) = y;
-            *(++temp) = y;
-            // NOT CORRECT
-        }
-
-        output.write(reinterpret_cast<char*>(row), rowSize);
-    }
+    delete[] pixelData;
+    delete[] Y;
+    delete[] Cb;
+    delete[] Cr;
 
     picture.close();
     output.close();
-    delete[] row;
     return 0;
 }

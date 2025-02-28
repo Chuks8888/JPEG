@@ -3,6 +3,10 @@
 namespace BMP {
     fileHeader header;
     bdiInfo info;
+
+    int rowSize;
+    int pixelRowSize;
+    int paddingBytes;
 }
 
 void BMP::readBMP(std::ifstream& pic)
@@ -20,11 +24,11 @@ void BMP::readBMP(std::ifstream& pic)
 
     pic.read(reinterpret_cast<char*>(&info), 0x28);
     
-    if(info.bdiSize < 0x0028)
+    /*if(info.bdiSize < 0x0028)
     {
         std::cerr << "non compatible DIB format\n";
         exit(3);
-    }
+    }*/
 
     if(info.BitCount != 0x18)
     {
@@ -38,6 +42,10 @@ void BMP::readBMP(std::ifstream& pic)
         std::cerr << "Image widht or height is not divisible by 8";
         exit(5);
     }
+
+    rowSize = (int)ceil((info.BitCount * info.Width) / 32) * 4;
+    pixelRowSize = (int)(info.Width * info.BitCount / 8);
+    paddingBytes = rowSize - pixelRowSize;
 }
 
 void BMP::printBMP()

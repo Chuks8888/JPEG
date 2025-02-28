@@ -37,6 +37,10 @@ namespace BMP
     
     extern fileHeader header;
     extern bdiInfo info;
+
+    extern int rowSize;
+    extern int pixelRowSize;
+    extern int paddingBytes;
     
     void readBMP(std::ifstream& pic);
     void printBMP();

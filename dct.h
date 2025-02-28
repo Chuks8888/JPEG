@@ -14,7 +14,8 @@ class dct
         static float coefficients[8];
         static bool init;
 
-        float getSum(int u, int v, float arr[]);
+        float getSum(int u, int v, int arr[]);
+        void quantizize(float arr[], int qualityFactor);
 
     public:
         dct();
@@ -23,7 +24,7 @@ class dct
         // This should be an inner class, to make this method private
         // so that this function is not called
         // on an array of a different size (i.e. not 64 elements)
-        void transform(float arr[]);   
+        void transform(int block[]);   
 };
 
 #endif
